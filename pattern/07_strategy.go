@@ -30,6 +30,7 @@ type Operator interface {
 // Addition - описывает алгоритм суммирования двух чисел.
 type Addition struct{}
 
+// Execute - сложение двух чисел a и b.
 func (add Addition) Execute(a, b int) int {
 	return a + b
 }
@@ -37,6 +38,7 @@ func (add Addition) Execute(a, b int) int {
 // Multiplication - описывает алгоритм умножения двух чисел.
 type Multiplication struct{}
 
+// Execute - умножение двух чисел a и b.
 func (n Multiplication) Execute(a, b int) int {
 	return a * b
 }
@@ -44,6 +46,7 @@ func (n Multiplication) Execute(a, b int) int {
 // Subtraction - описывает алгоритм вычитания двух чисел.
 type Subtraction struct{}
 
+// Execute - вычитание двух чисел a и b.
 func (s Subtraction) Execute(a, b int) int {
 	return a - b
 }
@@ -51,6 +54,7 @@ func (s Subtraction) Execute(a, b int) int {
 // Division - описывает алгоритм деления двух чисел.
 type Division struct{}
 
+// Execute - деление двух чисел a и b.
 func (d Division) Execute(a, b int) int {
 	return a / b
 }
