@@ -82,8 +82,8 @@ func (o Operation) DoOperation(a, b int) int {
 	return o.op.Execute(a, b)
 }
 
-// Client - код клиента.
-func Client() {
+// StrategyClient - код клиента.
+func StrategyClient() {
 	a, b := 20, 10
 
 	o := NewOperation(Addition{})
