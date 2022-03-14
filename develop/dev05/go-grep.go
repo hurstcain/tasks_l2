@@ -11,6 +11,55 @@ import (
 	"strings"
 )
 
+var (
+	redColor     = "\033[31m"
+	greenColor   = "\033[32m"
+	regularColor = "\033[0m"
+)
+
+type BeforeData struct {
+	index int
+	s     string
+}
+
+func NewBeforeData(index int, s string) BeforeData {
+	return BeforeData{
+		index: index,
+		s:     s,
+	}
+}
+
+type BeforeDataChannel struct {
+	ch         chan BeforeData
+	chCapacity int
+}
+
+func NewBeforeDataChannel(chanCapacity int) BeforeDataChannel {
+	return BeforeDataChannel{
+		ch:         make(chan BeforeData, chanCapacity),
+		chCapacity: chanCapacity,
+	}
+}
+
+func (c *BeforeDataChannel) WriteBeforeData(index int, s string) {
+	if len(c.ch) == c.chCapacity {
+		<-c.ch
+	}
+	c.ch <- NewBeforeData(index, s)
+}
+
+func (c *BeforeDataChannel) PrintBeforeData(lineNum bool) {
+	chLen := len(c.ch)
+	for i := 0; i < chLen; i++ {
+		data := <-c.ch
+		if lineNum {
+			fmt.Printf("%s%d: %s%s\n", greenColor, data.index, regularColor, data.s)
+		} else {
+			fmt.Print(lineNum, regularColor, data.s, "\n")
+		}
+	}
+}
+
 type GrepFlags struct {
 	Pattern    string
 	FileName   string
@@ -205,10 +254,6 @@ func (g Grep) createOrderedSet(indexesSet map[int]struct{}) []int {
 }
 
 func (g Grep) printStrings(orderedSet []int) {
-	redColor := "\033[31m"
-	greenColor := "\033[32m"
-	regularColor := "\033[0m"
-
 	for _, index := range orderedSet {
 		str := g.fileContent[index]
 		pattern := g.flags.Pattern
@@ -220,7 +265,7 @@ func (g Grep) printStrings(orderedSet []int) {
 
 		var lineNum string
 		if g.flags.LineNum {
-			lineNum = fmt.Sprintf("%s%d: ", greenColor, index)
+			lineNum = fmt.Sprintf("%s%d: ", greenColor, index+1)
 		}
 
 		if g.compare(str, pattern) {
@@ -238,6 +283,78 @@ func (g Grep) printMatchesCount() {
 }
 
 func (g *Grep) stdinSearch() {
+	reader := bufio.NewReader(os.Stdin)
+	index := 1
+	//lastMatchIndex := 1
+	beforeData := NewBeforeDataChannel(g.flags.Before)
+	afterCount := 0
+
+	for {
+		// s - введенная строка.
+		s, err := reader.ReadString('\n')
+		if err != nil {
+			log.Fatalf("Ошибка при чтении из stdin: %v", err)
+		}
+		// Слайс рун, в который будут скопированы руны из строки s, но без последних двух символов (10 и 13).
+		sRunes := make([]rune, len([]rune(s))-2)
+		copy(sRunes, []rune(s))
+		// Присваиваем строке новое значение без лишних символов в конце строки.
+		s = string(sRunes)
+
+		if s[0] == 4 && len(s) == 1 {
+			break
+		}
+
+		str := s
+		pattern := g.flags.Pattern
+
+		if g.flags.IgnoreCase {
+			str = strings.ToLower(str)
+			pattern = strings.ToLower(pattern)
+		}
+
+		var lineNum string
+		if g.flags.LineNum {
+			lineNum = fmt.Sprintf("%s%d: ", greenColor, index)
+		}
+
+		switch {
+		case g.flags.Invert:
+			if !g.compare(str, pattern) {
+				fmt.Print(lineNum, regularColor, s, "\n")
+				g.matchesCount++
+			}
+		default:
+			if g.compare(str, pattern) {
+				beforeData.PrintBeforeData(g.flags.LineNum)
+
+				fmt.Print(lineNum, redColor, s, "\n")
+
+				fmt.Print(regularColor)
+
+				afterCount = g.flags.After
+
+				g.matchesCount++
+
+				index++
+
+				continue
+			}
+		}
+
+		if afterCount > 0 {
+			fmt.Print(lineNum, regularColor, s, "\n")
+			afterCount--
+		} else {
+			beforeData.WriteBeforeData(index, s)
+		}
+
+		index++
+	}
+
+	if g.flags.Count {
+		g.printMatchesCount()
+	}
 }
 
 func main() {
