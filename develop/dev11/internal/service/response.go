@@ -2,9 +2,10 @@ package service
 
 import (
 	"encoding/json"
-	"github.com/hurstcain/tasks_l2/develop/dev11/internal/model"
 	"net/http"
 )
+
+import "github.com/hurstcain/tasks_l2/develop/dev11/internal/model"
 
 type PostResponse struct {
 	Result model.Event `json:"result"`
