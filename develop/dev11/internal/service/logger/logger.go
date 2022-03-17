@@ -4,6 +4,7 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"time"
 )
 
 type Logger struct {
@@ -24,6 +25,7 @@ func NewLogger() *Logger {
 
 func (l *Logger) LogRequest(handler http.Handler) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
+		l.Println("\n[" + time.Now().Format("2006-01-02 15:04:05") + "]")
 		l.Printf("-----Request-----\nmethod: %s\nURI: %s\n", r.Method, r.RequestURI)
 		handler.ServeHTTP(w, r)
 	}
