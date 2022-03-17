@@ -92,13 +92,13 @@ func TestUnpackString(t *testing.T) {
 
 	for _, data := range validTestData {
 		res, err := UnpackString(data.s)
-		assert.Equal(t, res, data.expected)
+		assert.Equal(t, data.expected, res)
 		assert.NoError(t, err)
 	}
 
 	for _, data := range invalidTestData {
 		res, err := UnpackString(data.s)
-		assert.Equal(t, res, data.expected)
+		assert.Equal(t, data.expected, res)
 		assert.Error(t, err)
 	}
 }
