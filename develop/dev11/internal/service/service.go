@@ -1,7 +1,7 @@
 package service
 
 import (
-	"github.com/hurstcain/tasks_l2/develop/dev11/internal/service/logger"
+	"context"
 	"net/http"
 	"net/url"
 	"time"
@@ -9,7 +9,9 @@ import (
 
 import (
 	"github.com/hurstcain/tasks_l2/develop/dev11/internal/cache"
+	"github.com/hurstcain/tasks_l2/develop/dev11/internal/config"
 	"github.com/hurstcain/tasks_l2/develop/dev11/internal/model"
+	"github.com/hurstcain/tasks_l2/develop/dev11/internal/service/logger"
 )
 
 const (
@@ -26,7 +28,7 @@ type Service struct {
 }
 
 func NewService() *Service {
-	addr := "127.0.0.1:8080"
+	addr := config.Ip + ":" + config.Port
 
 	service := &Service{
 		server: http.Server{
@@ -50,7 +52,21 @@ func NewService() *Service {
 }
 
 func (s *Service) Run() {
-	s.logger.Fatalln(s.server.ListenAndServe())
+	err := s.server.ListenAndServe()
+	if err == http.ErrServerClosed {
+		return
+	}
+	if err != nil {
+		s.logger.Printf("Error when running server: %s\n", err.Error())
+	}
+}
+
+func (s *Service) Stop() {
+	s.logger.Println("\nClosing server...")
+	err := s.server.Shutdown(context.Background())
+	if err != nil {
+		s.logger.Printf("Error when closing server: %s\n", err.Error())
+	}
 }
 
 func (s *Service) CreateEvent(w http.ResponseWriter, r *http.Request) {
