@@ -1,0 +1,81 @@
+
+[2022-03-21 15:30:26]
+-----Request-----
+method: POST
+URI: /create_event
+
+[2022-03-21 15:30:37]
+-----Request-----
+method: POST
+URI: /create_event
+
+[2022-03-21 15:30:40]
+-----Request-----
+method: POST
+URI: /create_event
+
+[2022-03-21 15:30:45]
+-----Request-----
+method: POST
+URI: /create_event
+Business logic error: event with this id already exists
+
+[2022-03-21 15:30:49]
+-----Request-----
+method: POST
+URI: /create_event
+
+[2022-03-21 15:30:57]
+-----Request-----
+method: GET
+URI: /events_for_day?user_id=pcell&date=2022-04-20
+Business logic error: no events for this day
+
+[2022-03-21 15:31:06]
+-----Request-----
+method: GET
+URI: /events_for_day?user_id=pcell&date=2022-03-20
+
+[2022-03-21 15:31:15]
+-----Request-----
+method: GET
+URI: /events_for_week?user_id=pcell&date=2022-03-17
+
+[2022-03-21 15:31:22]
+-----Request-----
+method: GET
+URI: /events_for_week?user_id=pcell&date=2022-03-30
+Business logic error: no events for this week
+
+[2022-03-21 15:31:27]
+-----Request-----
+method: GET
+URI: /events_for_month?user_id=pcell&date=2022-03-17
+
+[2022-03-21 15:31:32]
+-----Request-----
+method: GET
+URI: /events_for_month?user_id=pcell&date=2022-04-17
+Business logic error: no events for this year
+
+[2022-03-21 15:31:39]
+-----Request-----
+method: POST
+URI: /update_event
+Business logic error: event with this id doesn't exist
+
+[2022-03-21 15:31:45]
+-----Request-----
+method: POST
+URI: /update_event
+
+[2022-03-21 15:31:53]
+-----Request-----
+method: POST
+URI: /delete_event
+Business logic error: event with this id doesn't exist
+
+[2022-03-21 15:31:56]
+-----Request-----
+method: POST
+URI: /delete_event
